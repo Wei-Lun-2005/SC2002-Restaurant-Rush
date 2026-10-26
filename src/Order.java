@@ -6,35 +6,39 @@ public class Order {
     private int unitsDone;
     private OrderStatus status;
 
-    public Order(int id, Customer customer, MenuItem item){
+    public Order(int id, Customer customer, MenuItem item, int priceCents){
         this.id = id;
         this.customer = customer;
         this.item = item;
-        this.priceCents = item.getPriceCents();
+        this.priceCents = priceCents;
         this.unitsDone = 0;
         this.status = OrderStatus.PREPARING;
     }
 
-    public int getOrderId(){
+    public int getId(){
         return id;
+    }
+
+    public Customer getCustomer(){
+        return customer;
     }
         
     public MenuItem getItem(){
         return item;
     }
-        
-    public int getPriceCents(){
-        return priceCents;
-    }
-        
-    public int getUnitsDone(){
-        return unitsDone;
-    }
-        
+
     public OrderStatus getStatus(){
         return status;
     }
 
+    public int getUnitsDone(){
+        return unitsDone;
+    }
+    
+    public int getPriceCents(){
+        return priceCents;
+    }
+        
     public void advancePreparation(){
         if(status == OrderStatus.PREPARING){
             //increase unitsDone by 1
