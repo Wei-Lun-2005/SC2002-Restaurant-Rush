@@ -1,5 +1,5 @@
 public class Table {
-    private final int tableNumber;
+    private int tableNumber;
     private Customer customer;
 
     public Table(int tableNumber){
