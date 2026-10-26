@@ -10,9 +10,14 @@ public enum MenuItem {
         this.priceCents = priceCents;
         this.prepUnits = prepUnits;
     }
+    public String getName(){
+        return name();
+    }
+    
     public int getPriceCents(){
         return priceCents;
     }
+    
     public int getPrepUnits(){
         return prepUnits;
     }
