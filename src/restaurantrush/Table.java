@@ -10,27 +10,22 @@ public class Table {
     }
 
     public boolean isFree() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return customer == null;
     }
 
     public int getTableNumber() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return tableNumber;
     }
 
     public Customer getCustomer() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return customer;
     }
 
     public void seat(Customer c) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        this.customer = c;
     }
 
     public void release() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        this.customer = null;
     }
 }
