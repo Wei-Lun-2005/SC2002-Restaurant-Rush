@@ -5,18 +5,15 @@ public abstract class Staff {
     private boolean hasActed;
 
     public boolean canAct() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return !hasActed;
     }
 
     /** Call only after an action succeeds. */
     protected void markActed() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        hasActed = true;
     }
 
     public void resetForTurn() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        hasActed = false;
     }
 }
