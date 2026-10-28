@@ -1,5 +1,8 @@
 package restaurantrush;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.Queue;
@@ -9,6 +12,8 @@ import java.util.Queue;
  * the staff and the totals used for the result. Creates its tables and staff.
  */
 public class Restaurant {
+    private static final int TABLE_COUNT = 2;
+
     private Queue<Customer> waitingQueue;
     private List<Table> tables;
     private List<Order> orders;
@@ -22,114 +27,139 @@ public class Restaurant {
     private int unhappyDepartures;
 
     public Restaurant() {
-        // TODO: create the queue, the lists, the 2 tables and the 3 staff
+        waitingQueue = new ArrayDeque<>();
+        orders = new ArrayList<>();
+        tables = new ArrayList<>();
+        for (int number = 1; number <= TABLE_COUNT; number++) {
+            tables.add(new Table(number));
+        }
+        waiter = new Waiter();
+        chef = new Chef();
+        cashier = new Cashier();
+        revenueCents = 0;
+        paidCount = 0;
+        satisfactionSum = 0;
+        servedCount = 0;
+        unhappyDepartures = 0;
     }
 
     public void addToQueue(Customer c) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        waitingQueue.add(c);
     }
 
     public void removeFromQueue(Customer c) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        waitingQueue.remove(c);
     }
 
     public Table findFreeTable() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        for (Table t : tables) {
+            if (t.isFree()) {
+                return t;
+            }
+        }
+        return null;
     }
 
     public void releaseTable(Customer c) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        for (Table t : tables) {
+            if (t.getCustomer() == c) {
+                t.release();
+                return;
+            }
+        }
     }
 
     public void addOrder(Order o) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        orders.add(o);
     }
 
     public Customer findCustomer(int id) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        for (Customer c : waitingQueue) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+        for (Table t : tables) {
+            Customer c = t.getCustomer();
+            if (c != null && c.getId() == id) {
+                return c;
+            }
+        }
+        return null;
     }
 
     public Order findOrder(int id) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        for (Order o : orders) {
+            if (o.getId() == id) {
+                return o;
+            }
+        }
+        return null;
     }
 
     public void recordServed() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        servedCount++;
     }
 
     /** Adds the bill to revenue and records the satisfaction at payment. */
     public void recordPayment(int cents, int satisfaction) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
-    }
+        revenueCents += cents;
+        paidCount++;
+        satisfactionSum += satisfaction;
+    }   
 
     public void recordDeparture(Customer c) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        removeFromQueue(c);
+        releaseTable(c);
+        unhappyDepartures++;
     }
 
     /** Average satisfaction of paid customers, or empty if no one has paid. */
     public OptionalDouble averageSatisfaction() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (paidCount == 0) {
+            return OptionalDouble.empty();
+        }
+        return OptionalDouble.of((double) satisfactionSum / paidCount);
     }
 
     /** Read-only view of the queue, oldest first. */
     public List<Customer> getWaitingQueue() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return Collections.unmodifiableList(new ArrayList<>(waitingQueue));
     }
 
     public List<Table> getTables() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return Collections.unmodifiableList(tables);
     }
 
     public List<Order> getOrders() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return Collections.unmodifiableList(orders);
     }
 
     public int getRevenueCents() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return revenueCents;
     }
 
     public Waiter getWaiter() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return waiter;
     }
 
     public Chef getChef() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return chef;
     }
 
     public Cashier getCashier() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return cashier;
     }
 
     public int getPaidCount() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return paidCount;
     }
 
     public int getServedCount() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return servedCount;
     }
 
     public int getUnhappyDepartures() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return unhappyDepartures;
     }
 }

@@ -5,6 +5,10 @@ package restaurantrush;
  * through the mark...() methods. Subclasses supply getWaitPenalty().
  */
 public abstract class Customer {
+    private static final int START_SATISFACTION = 100;
+    private static final int MIN_SATISFACTION = 0;
+    private static final int NOT_YET = -1;
+
     private final int id;
     private int satisfaction;
     private CustomerStatus status;
@@ -13,74 +17,101 @@ public abstract class Customer {
     private int readyToPayTurn;
 
     protected Customer(int id) {
-        // TODO: also set the starting satisfaction and status
         this.id = id;
+        this.satisfaction = START_SATISFACTION;
+        this.status = CustomerStatus.WAITING;
+        this.order = null;
+        this.servedTurn = NOT_YET;
+        this.readyToPayTurn = NOT_YET;
     }
 
     public int getId() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return id;
     }
 
     public int getSatisfaction() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return satisfaction;
     }
 
     public CustomerStatus getStatus() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return status;
     }
 
     public Order getOrder() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return order;
     }
 
     public int getServedTurn() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return servedTurn;
     }
 
     public int getReadyToPayTurn() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return readyToPayTurn;
     }
 
     public void markSeated() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.WAITING) {
+            throw new IllegalStateException(
+                    "Customer " + id + " cannot be seated while " + status);
+        }
+        status = CustomerStatus.SEATED;
     }
 
     public void markOrdered(Order o) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.SEATED) {
+            throw new IllegalStateException(
+                    "Customer " + id + " cannot order while " + status);
+        }
+        if (o == null) {
+            throw new IllegalArgumentException("Order must not be null");
+        }
+        order = o;
+        status = CustomerStatus.ORDERED;
     }
 
     public void markServed(int turn) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.ORDERED) {
+            throw new IllegalStateException(
+                    "Customer " + id + " cannot be served while " + status);
+        }
+        servedTurn = turn;
+        status = CustomerStatus.EATING;
     }
 
     public void markReadyToPay(int turn) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.EATING) {
+            throw new IllegalStateException(
+                    "Customer " + id + " cannot become ready to pay while " + status);
+        }
+        readyToPayTurn = turn;
+        status = CustomerStatus.READY_TO_PAY;
     }
 
     public void markPaid() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.READY_TO_PAY) {
+            throw new IllegalStateException(
+                    "Customer " + id + " cannot pay while " + status);
+        }
+        status = CustomerStatus.PAID;
     }
 
     public void markLeft() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.WAITING
+                && status != CustomerStatus.SEATED
+                && status != CustomerStatus.ORDERED) {
+            throw new IllegalStateException(
+                    "Customer " + id + " cannot leave while " + status);
+        }
+        status = CustomerStatus.LEFT;
     }
 
-    /** Called at turn end for a customer who is still waiting or not yet served. */
     public void loseSatisfaction() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if (status != CustomerStatus.WAITING
+                && status != CustomerStatus.SEATED
+                && status != CustomerStatus.ORDERED) {
+            return;
+        }
+        satisfaction = Math.max(MIN_SATISFACTION, satisfaction - getWaitPenalty());
     }
 
     /** Satisfaction lost per waiting turn for this type of customer. */
@@ -88,13 +119,11 @@ public abstract class Customer {
 
     /** Bill for an item at the given base price. Full price unless overridden. */
     public int calculateBill(int baseCents) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return baseCents;
     }
-
-    /** The customer's own food choice, using the rule documented in the README. */
+    
     public MenuItem chooseItem() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        MenuItem[] menu = MenuItem.values();
+        return menu[Math.floorMod(id - 1, menu.length)];
     }
 }
