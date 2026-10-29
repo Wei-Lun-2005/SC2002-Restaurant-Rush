@@ -2,6 +2,7 @@ package restaurantrush;
 
 /** A standard customer: loses 8 satisfaction per waiting turn and pays full price. */
 public class RegularCustomer extends Customer {
+    private static final int WAIT_PENALTY = 8;
 
     public RegularCustomer(int id) {
         super(id);
@@ -9,7 +10,6 @@ public class RegularCustomer extends Customer {
 
     @Override
     protected int getWaitPenalty() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return WAIT_PENALTY;
     }
 }
