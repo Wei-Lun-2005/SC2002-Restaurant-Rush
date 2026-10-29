@@ -16,17 +16,15 @@ public enum MenuItem {
 
     /** Display name, e.g. "Salad". */
     public String getName() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        String s = name().toLowerCase(); //Change menu item name all to lower case
+        return s.substring(0,1).toUpperCase() + s.substring(1); 
     }
 
     public int getPriceCents() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return priceCents;
     }
 
     public int getPrepUnits() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return prepUnits;
     }
 }
