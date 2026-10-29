@@ -14,22 +14,18 @@ public class ActionResult {
     }
 
     public boolean isSuccess() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return success;
     }
 
     public String getMessage() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return message;
     }
 
     public static ActionResult ok() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return new ActionResult(true, "");
     }
 
     public static ActionResult fail(String message) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return new ActionResult(false, message);
     }
 }

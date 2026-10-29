@@ -1,5 +1,8 @@
 package restaurantrush;
 
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.OptionalDouble;
 import java.util.Scanner;
 
 /**
@@ -20,38 +23,180 @@ public class ConsoleUI {
     }
 
     public void run() {
-        // TODO: each turn: startTurn, display, prompt Waiter then Chef, endTurn, display
-        throw new UnsupportedOperationException("TODO");
+        while (controller.isGameOver() == false){
+            controller.startTurn();
+            displayTurnStart();
+            promptWaiter();
+            promptChef();
+            controller.endTurn();
+            displayTurnEnd();
+        }
+        displayResult();
     }
 
     private void displayTurnStart() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        System.out.println("Turn " + controller.getCurrentTurn() + ":");
+        Restaurant restaurant = controller.getRestaurant();
+        
+        List<Customer> queue = restaurant.getWaitingQueue();
+        System.out.println("Current queue:");
+        for (Customer customer : queue) {
+            System.out.println("Customer: " + customer.getId() + " Satisfaction: " + customer.getSatisfaction());
+        }
+
+        List<Table> tables = restaurant.getTables();
+        System.out.println("Tables:");
+        for (Table table : tables){
+            System.out.print(table.getTableNumber());
+            if (table.isFree()){
+                System.out.println(" is empty");
+            }
+            else{
+                Customer customer = table.getCustomer();
+                System.out.println(": " + customer.getId() + " " + customer.getStatus() + " " + customer.getSatisfaction());
+            }
+        }
+
+        List<Order> orders = restaurant.getOrders();
+        System.out.println("Orders :");
+        for (Order order : orders){
+            System.out.print(order.getId() + " " + order.getItem().getName() + " " + order.getStatus());
+            System.out.println(": Progress:" + order.getUnitsDone() + "/" + order.getItem().getPrepUnits());
+        }
+
+        System.out.println("Total revenue: " + formatDollars(restaurant.getRevenueCents()));
+        System.out.println();
+
     }
 
     private void promptWaiter() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+
+        Restaurant restaurant = controller.getRestaurant();
+        boolean canAct = false;
+
+        if (!restaurant.getWaitingQueue().isEmpty() && restaurant.findFreeTable() != null) {
+            canAct = true;
+        }
+        for (Table t : restaurant.getTables()) {
+            Customer c = t.getCustomer();
+            if (c != null && c.getStatus() == CustomerStatus.SEATED) {
+            canAct = true;
+            }
+        }       
+        for (Order o : restaurant.getOrders()) {
+            if (o.getStatus() == OrderStatus.READY) {
+            canAct = true;
+            }
+        }
+
+        if (!canAct) {
+            System.out.println("Waiter has nothing to do this turn.");
+            return;
+        }
+
+        boolean success = false;
+            while (success == false) {
+                try {
+                    System.out.println("Choose waiter's action: ");
+                    System.out.println("Offer Seat (1)");
+                    System.out.println("Take Order (2)");
+                    System.out.println("Serve (3)");
+                    int choice = scanner.nextInt();
+
+                    ActionResult result;
+                    switch (choice) {
+                        case 1:
+                            System.out.println("Enter customer ID:");
+                            result = controller.seatCustomer(scanner.nextInt());
+                            break;
+                        case 2:
+                            System.out.println("Enter customer ID:");
+                            result = controller.takeOrder(scanner.nextInt());
+                            break;
+                        case 3:
+                            System.out.println("Enter order ID:");
+                            result = controller.serveOrder(scanner.nextInt());
+                            break;
+                        default:
+                            System.out.println("Invalid option, try again.");
+                            continue;
+                    }
+
+                    if (result.isSuccess()) {
+                        success = true;
+                    } else {
+                        System.out.println(result.getMessage());
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input, please enter a number.");
+                    scanner.next();
+                }
+            }
     }
 
     private void promptChef() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        Restaurant restaurant = controller.getRestaurant();
+        boolean canAct = false;
+
+        for (Order o : restaurant.getOrders()) {
+            if (o.getStatus() == OrderStatus.PREPARING) {
+                canAct = true;
+            }
+        }
+        if (!canAct) {
+            System.out.println("Chef has nothing to do this turn.");
+            return;
+        }
+
+        boolean success = false;
+
+        while (success == false) {
+            try {
+                System.out.println("Enter order ID to prepare:");
+                ActionResult result = controller.prepareOrder(scanner.nextInt());
+
+                if (result.isSuccess()) {
+                    success = true;
+                } else {
+                    System.out.println(result.getMessage());
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input, please enter a number.");
+                scanner.next();
+                }
+        }
     }
 
     private void displayTurnEnd() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        Restaurant restaurant = controller.getRestaurant();
+        System.out.println("End of turn " + controller.getCurrentTurn());
+        System.out.println("Customers paid: " + restaurant.getPaidCount());
+        System.out.println("Unhappy departures: " + restaurant.getUnhappyDepartures());
+        System.out.println("Total revenue: " + formatDollars(restaurant.getRevenueCents()));
+        System.out.println();
     }
 
     private void displayResult() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        Restaurant restaurant = controller.getRestaurant();
+        System.out.println("===== GAME OVER =====");
+        if (controller.isVictory()) {
+            System.out.println("You win!");
+        } else {
+            System.out.println("You lose.");
+        }
+        System.out.println("Customers paid: " + restaurant.getPaidCount());
+        System.out.println("Total revenue: " + formatDollars(restaurant.getRevenueCents()));
+
+        OptionalDouble avg = restaurant.averageSatisfaction();
+        if (avg.isPresent()) {
+            System.out.printf("Average satisfaction: %.1f%n", avg.getAsDouble());
+        } else {
+            System.out.println("Average satisfaction: NA (no customers paid)");
+        }
     }
 
-    /** Formats cents as dollars with two decimals, e.g. 4500 becomes "$45.00". */
+
     private String formatDollars(int cents) {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return String.format("$%d.%02d", cents / 100, cents % 100);
     }
 }
