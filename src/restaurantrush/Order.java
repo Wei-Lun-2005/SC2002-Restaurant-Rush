@@ -10,67 +10,68 @@ public class Order {
     private OrderStatus status;
 
     public Order(int id, Customer c, MenuItem item, int priceCents) {
-        // TODO: also set unitsDone and status
         this.id = id;
         this.customer = c;
         this.item = item;
         this.priceCents = priceCents;
+        this.unitsDone = 0;
+        this.status = OrderStatus.PREPARING;
     }
 
     public int getId() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return id;
     }
 
     public Customer getCustomer() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return customer;
     }
 
     public MenuItem getItem() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return item;
     }
 
     public OrderStatus getStatus() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return status;
     }
 
     public int getUnitsDone() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return unitsDone;
     }
 
     public int getPriceCents() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return priceCents;
     }
 
     /** Does one preparation unit. Becomes READY when the last unit is done. */
     public void advancePreparation() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if(status == OrderStatus.PREPARING){
+            unitsDone++;
+            if(unitsDone >= item.getPrepUnits()){
+                status = OrderStatus.READY;
+            }
+        }
     }
 
     public boolean isReady() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        return status == OrderStatus.READY;
     }
 
     public void markServed() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if(status == OrderStatus.READY){
+            status = OrderStatus.SERVED;
+        }
     }
 
     public void markPaid() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if(status == OrderStatus.SERVED){
+            status = OrderStatus.PAID;
+        }
     }
 
     /** Cancels an unfinished order when its customer leaves. */
     public void cancel() {
-        // TODO
-        throw new UnsupportedOperationException("TODO");
+        if(status == OrderStatus.PREPARING || status == OrderStatus.READY){
+            status = OrderStatus.CANCELLED;
+        }
     }
 }
