@@ -9,7 +9,7 @@ import java.util.OptionalDouble;
  * The UI only calls these methods and displays the results.
  */
 public class GameController {
-    private static final int MAX_TURNS = 18;
+    public static final int MAX_TURNS = 18;
     private static final int REQUIRED_PAID = 4;
     private static final int REQUIRED_REVENUE_CENTS = 4500;
     private static final int REQUIRED_AVG_SATISFACTION = 60;
