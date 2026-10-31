@@ -135,17 +135,27 @@ public class ConsoleUI {
                     System.out.println("Offer Seat (1)");
                     System.out.println("Take Order (2)");
                     System.out.println("Serve (3)");
+                    System.out.println("Wait (0)");
                     int choice = scanner.nextInt();
 
                     ActionResult result;
                     switch (choice) {
+                        case 0:
+                            System.out.println("Waiter waits this turn.");
+                            return;
                         case 1:
                             System.out.println("Enter customer ID:");
                             result = controller.seatCustomer(scanner.nextInt());
                             break;
                         case 2:
                             System.out.println("Enter customer ID:");
-                            result = controller.takeOrder(scanner.nextInt());
+                            int customerId = scanner.nextInt();
+                            result = controller.takeOrder(customerId);
+                            if (result.isSuccess()) {
+                                Order order = restaurant.findCustomer(customerId).getOrder();
+                                System.out.println("Customer " + customerId + " ordered " + order.getItem().getName()
+                                        + " (order " + order.getId() + ").");
+                            }
                             break;
                         case 3:
                             System.out.println("Enter order ID:");
@@ -186,8 +196,13 @@ public class ConsoleUI {
 
         while (success == false) {
             try {
-                System.out.println("Enter order ID to prepare:");
-                ActionResult result = controller.prepareOrder(scanner.nextInt());
+                System.out.println("Enter order ID to prepare (0 to wait):");
+                int orderId = scanner.nextInt();
+                if (orderId == 0) {
+                    System.out.println("Chef waits this turn.");
+                    return;
+                }
+                ActionResult result = controller.prepareOrder(orderId);
 
                 if (result.isSuccess()) {
                     success = true;
