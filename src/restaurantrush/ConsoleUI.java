@@ -4,6 +4,7 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * Collects the manager's choices and displays the game state.
@@ -65,6 +66,39 @@ public class ConsoleUI {
         }
 
         System.out.println("Total revenue: " + formatDollars(restaurant.getRevenueCents()));
+
+        OptionalDouble avg = restaurant.averageSatisfaction();
+        System.out.println("Average satisfaction: " + (avg.isPresent() ? String.format("%.1f", avg.getAsDouble()) : "N/A"));
+
+        List<String> waiterTasks = new ArrayList<>();
+        if (restaurant.findFreeTable() != null) {
+            for (Customer c : queue) {
+                waiterTasks.add("seat customer " + c.getId());
+            }
+        }
+        for (Table t : tables) {
+            Customer c = t.getCustomer();
+            if (c != null && c.getStatus() == CustomerStatus.SEATED) {
+                waiterTasks.add("take order from customer " + c.getId());
+            }
+        }
+        for (Order o : orders) {
+            if (o.getStatus() == OrderStatus.READY) {
+                waiterTasks.add("serve order " + o.getId());
+            }
+        }
+
+        List<String> chefTasks = new ArrayList<>();
+        for (Order o : orders) {
+            if (o.getStatus() == OrderStatus.PREPARING) {
+                chefTasks.add("prepare order " + o.getId());
+            }
+        }
+
+        System.out.println("Staff tasks available:");
+        System.out.println("Waiter: " + (waiterTasks.isEmpty() ? "nothing to do" : String.join(", ", waiterTasks)));
+        System.out.println("Chef: " + (chefTasks.isEmpty() ? "nothing to do" : String.join(", ", chefTasks)));
+
         System.out.println();
 
     }
@@ -101,17 +135,27 @@ public class ConsoleUI {
                     System.out.println("Offer Seat (1)");
                     System.out.println("Take Order (2)");
                     System.out.println("Serve (3)");
+                    System.out.println("Wait (0)");
                     int choice = scanner.nextInt();
 
                     ActionResult result;
                     switch (choice) {
+                        case 0:
+                            System.out.println("Waiter waits this turn.");
+                            return;
                         case 1:
                             System.out.println("Enter customer ID:");
                             result = controller.seatCustomer(scanner.nextInt());
                             break;
                         case 2:
                             System.out.println("Enter customer ID:");
-                            result = controller.takeOrder(scanner.nextInt());
+                            int customerId = scanner.nextInt();
+                            result = controller.takeOrder(customerId);
+                            if (result.isSuccess()) {
+                                Order order = restaurant.findCustomer(customerId).getOrder();
+                                System.out.println("Customer " + customerId + " ordered " + order.getItem().getName()
+                                        + " (order " + order.getId() + ").");
+                            }
                             break;
                         case 3:
                             System.out.println("Enter order ID:");
@@ -152,8 +196,13 @@ public class ConsoleUI {
 
         while (success == false) {
             try {
-                System.out.println("Enter order ID to prepare:");
-                ActionResult result = controller.prepareOrder(scanner.nextInt());
+                System.out.println("Enter order ID to prepare (0 to wait):");
+                int orderId = scanner.nextInt();
+                if (orderId == 0) {
+                    System.out.println("Chef waits this turn.");
+                    return;
+                }
+                ActionResult result = controller.prepareOrder(orderId);
 
                 if (result.isSuccess()) {
                     success = true;
@@ -170,9 +219,12 @@ public class ConsoleUI {
     private void displayTurnEnd() {
         Restaurant restaurant = controller.getRestaurant();
         System.out.println("End of turn " + controller.getCurrentTurn());
-        System.out.println("Customers paid: " + restaurant.getPaidCount());
+        System.out.println("Customers served: " + restaurant.getServedCount());
         System.out.println("Unhappy departures: " + restaurant.getUnhappyDepartures());
         System.out.println("Total revenue: " + formatDollars(restaurant.getRevenueCents()));
+        OptionalDouble avg = restaurant.averageSatisfaction();
+        System.out.println("Average satisfaction: " + (avg.isPresent() ? String.format("%.1f", avg.getAsDouble()) : "N/A"));
+        System.out.println("Turns used: " + controller.getCurrentTurn() + "/" + GameController.MAX_TURNS);
         System.out.println();
     }
 
@@ -185,14 +237,12 @@ public class ConsoleUI {
             System.out.println("You lose.");
         }
         System.out.println("Customers paid: " + restaurant.getPaidCount());
+        System.out.println("Customers served: " + restaurant.getServedCount());
+        System.out.println("Unhappy departures: " + restaurant.getUnhappyDepartures());
         System.out.println("Total revenue: " + formatDollars(restaurant.getRevenueCents()));
-
         OptionalDouble avg = restaurant.averageSatisfaction();
-        if (avg.isPresent()) {
-            System.out.printf("Average satisfaction: %.1f%n", avg.getAsDouble());
-        } else {
-            System.out.println("Average satisfaction: NA (no customers paid)");
-        }
+        System.out.println("Average satisfaction: " + (avg.isPresent() ? String.format("%.1f", avg.getAsDouble()) : "N/A"));
+        System.out.println("Turns used: " + controller.getCurrentTurn() + "/" + GameController.MAX_TURNS);
     }
 
 
