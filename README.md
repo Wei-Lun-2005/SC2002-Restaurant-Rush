@@ -13,6 +13,8 @@ java -cp out restaurantrush.ConsoleUI
 
 Each turn, pick the Waiter's task and the id it applies to, then the order id for the Chef. Enter `0` to let either of them wait.
 
+Reproducible victory and defeat runs are in [docs/test-notes.md](docs/test-notes.md).
+
 ## Customer food choice
 
 Customers choose their own dish; the manager never chooses it. The rule is fixed so every run can be reproduced: customers are numbered 1 to 6 in arrival order, and customer *n* orders menu item (*n* − 1) mod 3.
