@@ -14,6 +14,11 @@ public class CriticCustomer extends Customer {
     }
 
     @Override
+    public String getTypeName() {
+        return "Critic";
+    }
+
+    @Override
     public MenuItem chooseItem() {
         return MenuItem.PASTA;
     }

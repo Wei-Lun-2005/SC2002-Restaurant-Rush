@@ -117,6 +117,9 @@ public abstract class Customer {
     /** Satisfaction lost per waiting turn for this type of customer. */
     protected abstract int getWaitPenalty();
 
+    /** Type label shown in the UI, e.g. "VIP". */
+    public abstract String getTypeName();
+
     /** Bill for an item at the given base price. Full price unless overridden. */
     public int calculateBill(int baseCents) {
         return baseCents;

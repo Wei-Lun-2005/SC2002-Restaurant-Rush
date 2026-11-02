@@ -15,6 +15,11 @@ public class VIPCustomer extends Customer {
     }
 
     @Override
+    public String getTypeName() {
+        return "VIP";
+    }
+
+    @Override
     public int calculateBill(int baseCents) {
         return baseCents * (100 - DISCOUNT_PERCENT) / 100;
     }

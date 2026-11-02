@@ -12,4 +12,9 @@ public class RegularCustomer extends Customer {
     protected int getWaitPenalty() {
         return WAIT_PENALTY;
     }
+
+    @Override
+    public String getTypeName() {
+        return "Regular";
+    }
 }
