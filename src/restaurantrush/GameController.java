@@ -14,6 +14,8 @@ public class GameController {
     private static final int REQUIRED_REVENUE_CENTS = 4500;
     private static final int REQUIRED_AVG_SATISFACTION = 60;
     private static final int[] ARRIVAL_TURNS = {1, 4, 7, 10, 13, 16};
+    private static final int VIP_ARRIVAL_TURN = 4;
+    private static final int CRITIC_ARRIVAL_TURN = 10;
 
     private int currentTurn;
     private final Restaurant restaurant;
@@ -152,6 +154,12 @@ public class GameController {
             if (ARRIVAL_TURNS[i] == turn) {
                 customerId = i + 1;
             }
+        }
+        if (turn == VIP_ARRIVAL_TURN) {
+            return new VIPCustomer(customerId);
+        }
+        if (turn == CRITIC_ARRIVAL_TURN) {
+            return new CriticCustomer(customerId);
         }
         return new RegularCustomer(customerId);
     }

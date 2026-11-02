@@ -42,7 +42,7 @@ public class ConsoleUI {
         List<Customer> queue = restaurant.getWaitingQueue();
         System.out.println("Current queue:");
         for (Customer customer : queue) {
-            System.out.println("Customer: " + customer.getId() + " Satisfaction: " + customer.getSatisfaction());
+            System.out.println("Customer: " + customer.getId() + " (" + customer.getTypeName() + ") Satisfaction: " + customer.getSatisfaction());
         }
 
         List<Table> tables = restaurant.getTables();
@@ -54,7 +54,7 @@ public class ConsoleUI {
             }
             else{
                 Customer customer = table.getCustomer();
-                System.out.println(": " + customer.getId() + " " + customer.getStatus() + " " + customer.getSatisfaction());
+                System.out.println(": " + customer.getId() + " (" + customer.getTypeName() + ") " + customer.getStatus() + " " + customer.getSatisfaction());
             }
         }
 
