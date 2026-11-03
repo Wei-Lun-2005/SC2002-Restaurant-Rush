@@ -4,12 +4,12 @@ package restaurantrush;
 public class Order {
     private final int id;
     private final Customer customer;
-    private final MenuItem item;
+    private final Dish item;
     private final int priceCents;
     private int unitsDone;
     private OrderStatus status;
 
-    public Order(int id, Customer c, MenuItem item, int priceCents) {
+    public Order(int id, Customer c, Dish item, int priceCents) {
         this.id = id;
         this.customer = c;
         this.item = item;
@@ -26,7 +26,7 @@ public class Order {
         return customer;
     }
 
-    public MenuItem getItem() {
+    public Dish getItem() {
         return item;
     }
 
