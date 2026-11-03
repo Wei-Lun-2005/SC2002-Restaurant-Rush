@@ -19,7 +19,7 @@ public class CriticCustomer extends Customer {
     }
 
     @Override
-    public MenuItem chooseItem() {
+    public Dish chooseItem() {
         return MenuItem.PASTA;
     }
 }

@@ -7,6 +7,7 @@ package restaurantrush;
 public abstract class Customer {
     private static final int START_SATISFACTION = 100;
     private static final int MIN_SATISFACTION = 0;
+    private static final int MAX_SATISFACTION = 100;
     private static final int NOT_YET = -1;
 
     private final int id;
@@ -114,6 +115,19 @@ public abstract class Customer {
         satisfaction = Math.max(MIN_SATISFACTION, satisfaction - getWaitPenalty());
     }
 
+    /**
+     * Happy Hour recovery: a customer still waiting for a table or food gains
+     * the given amount, up to 100. Anyone else is unchanged.
+     */
+    public void recoverSatisfaction(int amount) {
+        if (status != CustomerStatus.WAITING
+                && status != CustomerStatus.SEATED
+                && status != CustomerStatus.ORDERED) {
+            return;
+        }
+        satisfaction = Math.min(MAX_SATISFACTION, satisfaction + amount);
+    }
+
     /** Satisfaction lost per waiting turn for this type of customer. */
     protected abstract int getWaitPenalty();
 
@@ -125,8 +139,18 @@ public abstract class Customer {
         return baseCents;
     }
     
-    public MenuItem chooseItem() {
+    /**
+     * The customer's own food choice. Customer n's usual item is menu item
+     * (n - 1) mod 3. Even-numbered customers order a combo of their usual
+     * item and the next item on the menu.
+     */
+    public Dish chooseItem() {
         MenuItem[] menu = MenuItem.values();
-        return menu[Math.floorMod(id - 1, menu.length)];
+        MenuItem usual = menu[Math.floorMod(id - 1, menu.length)];
+        if (id % 2 != 0) {
+            return usual;
+        }
+        MenuItem next = menu[Math.floorMod(id, menu.length)];
+        return new ComboMeal(usual, next);
     }
 }
