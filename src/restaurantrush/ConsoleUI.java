@@ -128,11 +128,11 @@ public class ConsoleUI {
         
         while (true) {
             System.out.print("Activate Happy Hour now? (y/n): ");
-            String in = scanner.nextLine().trim().toLowerCase();
+            String in = scanner.next().trim().toLowerCase();
             if (in.equals("n")) return;
             if (in.equals("y")) {
                 ActionResult r = controller.activateHappyHour();
-                System.out.println(r.getMessage());
+                System.out.println(r.isSuccess() ? "Happy Hour started." : r.getMessage());
                 return;
             }
             System.out.println("Please enter y or n.");  
@@ -150,14 +150,14 @@ public class ConsoleUI {
         }
         while (true) {
             System.out.print("Customer id: ");
-            String in = scanner.nextLine().trim();
+            String in = scanner.next().trim();
             int id;
             try { id = Integer.parseInt(in); }
             catch (NumberFormatException e) { System.out.println("Enter a number."); continue; }
             if (id == 0) return;
             ActionResult res = controller.hostSeatCustomer(id);
-            System.out.println(res.getMessage());
             if (res.isSuccess()) return;
+            System.out.println(res.getMessage());
         }    
     }
 
