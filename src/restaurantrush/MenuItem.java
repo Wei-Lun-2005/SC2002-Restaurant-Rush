@@ -1,7 +1,7 @@
 package restaurantrush;
 
 /** The three dishes on the menu. Prices are in cents. */
-public enum MenuItem {
+public enum MenuItem implements Dish {
     SALAD(900, 1),
     BURGER(1500, 1),
     PASTA(1800, 2);
