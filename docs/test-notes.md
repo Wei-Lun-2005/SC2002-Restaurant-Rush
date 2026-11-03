@@ -9,20 +9,114 @@ Build first (see the README), then feed an input file to the game from the repos
 Bash, Git Bash or macOS/Linux:
 
 ```
-java -cp out restaurantrush.ConsoleUI < docs/test-runs/stage2-victory.txt
-java -cp out restaurantrush.ConsoleUI < docs/test-runs/stage2-defeat.txt
+java -cp out restaurantrush.ConsoleUI < docs/test-runs/stage3-victory.txt
+java -cp out restaurantrush.ConsoleUI < docs/test-runs/stage3-defeat.txt
 ```
 
 Windows PowerShell:
 
 ```
-cmd /c "java -cp out restaurantrush.ConsoleUI < docs\test-runs\stage2-victory.txt"
-cmd /c "java -cp out restaurantrush.ConsoleUI < docs\test-runs\stage2-defeat.txt"
+cmd /c "java -cp out restaurantrush.ConsoleUI < docs\test-runs\stage3-victory.txt"
+cmd /c "java -cp out restaurantrush.ConsoleUI < docs\test-runs\stage3-defeat.txt"
 ```
 
-You can also type the inputs below by hand. A prompt only appears when that staff member has something to do, so some turns have no Waiter or Chef input.
+You can also type the inputs below by hand. Each turn the prompts come in this order, and each one only appears when it applies:
+
+1. Happy Hour (`y` or `n`), until it has been used.
+2. Host (a customer id, or `0` to skip), when a customer is waiting and a table is free.
+3. Waiter (a task and an id, or `0` to wait), when the Waiter has something to do.
+4. Chef (an order id, or `0` to wait), when an order is being prepared.
+
+The Stage 1 and Stage 2 runs below were recorded at their tags. Later stages add prompts and change the customers' orders, so to replay them check out the tag first (`git checkout stage-1` or `git checkout stage-2`) and build again.
+
+## Stage 3 runs
+
+Stage 3 adds the Host, ComboMeal and Happy Hour (see the README). Customers 2 and 6 now order combos, and the UI shows each order's locked price, for example `Customer 4 ordered Pasta (order 4, $14.40).`
+
+| Customer | Type | Orders | Price |
+|----------|------|--------|-------|
+| 1 | Regular | Salad | $9.00 |
+| 2 | VIP | Burger and Pasta (combo, 3 Chef turns) | $29.70 less 10% = $26.73 |
+| 3 | Regular | Pasta | $18.00 |
+| 4 | Critic | Pasta | $18.00 |
+| 5 | Regular | Burger | $15.00 |
+| 6 | Regular | Pasta and Salad (combo, 3 Chef turns) | $24.30 |
+
+Happy Hour takes a further 20% off orders taken while it is active.
+
+### Victory run
+
+Input file: [`test-runs/stage3-victory.txt`](test-runs/stage3-victory.txt)
+
+When a customer arrives and a table is free, the Host seats them and the Waiter takes their order in the same turn. Happy Hour is switched on at the start of turn 10, while customer 3 is waiting for food and the Critic has just arrived.
+
+| Turn | Happy Hour | Host | Waiter | Chef | What happens | Served | Departures | Revenue | Average |
+|------|------------|------|--------|------|--------------|--------|------------|---------|---------|
+| 1 | `n` | `1` | `2` `1` | `1` | Customer 1 (Regular) arrives; the Host seats them, the Waiter takes their order (Salad, $9.00) and the Chef finishes it (READY) | 0 | 0 | $0.00 | N/A |
+| 2 | `n` | — | `3` `1` | — | Salad served at 92 | 1 | 0 | $0.00 | N/A |
+| 3 | `n` | — | — | — | Customer 1 finishes eating (READY_TO_PAY); no staff member has anything to do | 1 | 0 | $0.00 | N/A |
+| 4 | `n` | `2` | `2` `2` | `2` | Customer 2 (VIP) arrives, is seated and orders Burger and Pasta ($26.73, unit 1 of 3); customer 1 pays $9.00 at 92 | 1 | 0 | $9.00 | 92.0 |
+| 5 | `n` | — | — | `2` | Combo unit 2 of 3 | 1 | 0 | $9.00 | 92.0 |
+| 6 | `n` | — | — | `2` | Combo unit 3 of 3 (READY) | 1 | 0 | $9.00 | 92.0 |
+| 7 | `n` | `3` | `3` `2` | — | Customer 3 (Regular) arrives and the Host seats them; the Waiter serves the combo to the VIP at 85 | 2 | 0 | $9.00 | 92.0 |
+| 8 | `n` | — | `2` `3` | `3` | Customer 3 orders Pasta ($18.00, unit 1 of 2); the VIP is READY_TO_PAY | 2 | 0 | $9.00 | 92.0 |
+| 9 | `n` | — | — | `3` | Pasta unit 2 of 2 (READY); the VIP pays $26.73 at 85 | 2 | 0 | $35.73 | 88.5 |
+| 10 | `y` | `4` | `3` `3` | — | Customer 4 (Critic) arrives. Happy Hour starts (2 turns): customer 3, still waiting for food, recovers from 76 to 91. The Host seats the Critic; the Waiter serves the Pasta to customer 3 at 91 | 3 | 0 | $35.73 | 88.5 |
+| 11 | — | — | `2` `4` | `4` | Happy Hour, 1 turn left: the Critic recovers from 88 to 100 (the maximum), then orders Pasta at $14.40 ($18.00 less 20%), unit 1 of 2; customer 3 is READY_TO_PAY | 3 | 0 | $35.73 | 88.5 |
+| 12 | — | — | — | `4` | Happy Hour has ended. Pasta unit 2 of 2 (READY); customer 3 pays $18.00 at 91, because the order was taken before Happy Hour | 3 | 0 | $53.73 | 89.3 |
+| 13 | — | `5` | `3` `4` | — | Customer 5 (Regular) arrives and the Host seats them; the Critic's Pasta is served at 76 | 4 | 0 | $53.73 | 89.3 |
+| 14 | — | — | `2` `5` | `5` | Customer 5 orders Burger ($15.00, READY); the Critic is READY_TO_PAY | 4 | 0 | $53.73 | 89.3 |
+| 15 | — | — | `3` `5` | — | Burger served at 84; the Critic pays $14.40 at 76 | 5 | 0 | $68.13 | 86.0 |
+| 16 | — | `6` | `2` `6` | `6` | Customer 6 (Regular) arrives, is seated and orders Pasta and Salad ($24.30, unit 1 of 3); customer 5 is READY_TO_PAY | 5 | 0 | $68.13 | 86.0 |
+| 17 | — | — | — | `6` | Combo unit 2 of 3; customer 5 pays $15.00 at 84 | 5 | 0 | $83.13 | 85.6 |
+| 18 | — | — | — | `6` | Combo unit 3 of 3 (READY); customer 6 cannot be served within 18 turns | 5 | 0 | $83.13 | 85.6 |
+
+Final result:
+
+```
+You win!
+Customers paid: 5
+Customers served: 5
+Unhappy departures: 0
+Total revenue: $83.13
+Average satisfaction: 85.6
+Turns used: 18/18
+```
+
+All three targets are met: 5 paid (at least 4), $83.13 (at least $45.00) and an average of 85.6 (at least 60).
+
+Compared with the Stage 2 victory run ($73.50, average 75.6), the Host lets a customer be seated and order in the same turn, so customers wait less. Happy Hour costs $3.60 on the Critic's Pasta but lifts customer 3 to 91 and keeps the Critic at 76 when paying, instead of 52 in Stage 2.
+
+### Defeat run
+
+Input file: [`test-runs/stage3-defeat.txt`](test-runs/stage3-defeat.txt)
+
+Every turn: no Happy Hour (`n`), the Host skips (`0`) and the Waiter waits (`0`). No one is seated, so the Chef never has an order to prepare.
+
+| Turns | What happens | Served | Departures | Revenue | Average |
+|-------|--------------|--------|------------|---------|---------|
+| 1–12 | Customers queue: Regulars lose 8 per turn, the VIP 5 and the Critic 12 | 0 | 0 | $0.00 | N/A |
+| 13 | Customer 1 (Regular, arrived turn 1) reaches 0 and leaves | 0 | 1 | $0.00 | N/A |
+| 14–17 | Customers keep waiting | 0 | 1 | $0.00 | N/A |
+| 18 | Customer 4 (Critic, arrived turn 10) reaches 0 and leaves | 0 | 2 | $0.00 | N/A |
+
+Final result:
+
+```
+You lose.
+Customers paid: 0
+Customers served: 0
+Unhappy departures: 2
+Total revenue: $0.00
+Average satisfaction: N/A
+Turns used: 18/18
+```
+
+No target is met. With Happy Hour never used, the departures are the same as in the Stage 2 defeat run.
 
 ## Stage 2 runs
+
+These runs were recorded at tag `stage-2`. To replay them, run `git checkout stage-2`, build, and use `docs/test-runs/stage2-victory.txt` and `docs/test-runs/stage2-defeat.txt`.
 
 Customer 2 (arrives turn 4) is a VIP and customer 4 (arrives turn 10) is a Critic. The other four are Regular, so there are still six arrivals. The UI labels each customer with its type, for example `Customer: 4 (Critic) Satisfaction: 88`.
 

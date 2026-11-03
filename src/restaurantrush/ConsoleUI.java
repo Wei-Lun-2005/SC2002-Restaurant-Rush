@@ -212,7 +212,7 @@ public class ConsoleUI {
                             if (result.isSuccess()) {
                                 Order order = restaurant.findCustomer(customerId).getOrder();
                                 System.out.println("Customer " + customerId + " ordered " + order.getItem().getName()
-                                        + " (order " + order.getId() + ").");
+                                        + " (order " + order.getId() + ", " + formatDollars(order.getPriceCents()) + ").");
                             }
                             break;
                         case 3:
