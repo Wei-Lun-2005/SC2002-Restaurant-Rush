@@ -29,7 +29,8 @@ public class Cashier extends Staff {
         }
 
         Order order = payingCustomer.getOrder();
-        int bill = payingCustomer.calculateBill(order.getPriceCents());
+        // The price was locked when the order was taken, with any discounts already applied.
+        int bill = order.getPriceCents();
         int satisfaction = payingCustomer.getSatisfaction();
         r.recordPayment(bill, satisfaction);
         payingCustomer.markPaid();
