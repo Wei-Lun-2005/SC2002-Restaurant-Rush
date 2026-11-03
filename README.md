@@ -2,6 +2,8 @@
 
 SC2002 group assignment: a turn-based restaurant management game with a command-line interface, written in Java.
 
+Repository: https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush
+
 ## Build and run
 
 Requires Java 17 or later. From the repository root:
@@ -11,7 +13,7 @@ javac --release 17 -d out src/restaurantrush/*.java
 java -cp out restaurantrush.ConsoleUI
 ```
 
-Each turn, pick the Waiter's task and the id it applies to, then the order id for the Chef. Enter `0` to let either of them wait.
+Each turn, choose whether to start Happy Hour (`y` or `n`, until it has been used), then which waiting customer the Host seats, then the Waiter's task and the id it applies to, then the order id for the Chef. Enter `0` to let the Host, Waiter or Chef skip. A prompt only appears when it applies.
 
 Reproducible victory and defeat runs are in [docs/test-notes.md](docs/test-notes.md).
 
@@ -37,8 +39,31 @@ Customers choose their own dish; the manager never chooses it. The rule is fixed
 | Customer | 1 | 2 | 3 | 4 | 5 | 6 |
 |----------|---|---|---|---|---|---|
 | Type | Regular | VIP | Regular | Critic | Regular | Regular |
-| Orders | Salad | Burger + Pasta combo | Pasta | Pasta | Burger | Pasta + Salad combo |
+| Orders | Salad | Burger and Pasta (combo) | Pasta | Pasta | Burger | Pasta and Salad (combo) |
 | Price | $9.00 | $29.70, VIP pays $26.73 | $18.00 | $18.00 | $15.00 | $24.30 |
+
+## Host
+
+The Host is a fourth staff member. Each turn the Host can seat at most one waiting customer, in addition to the Waiter, with the same checks: the customer must be waiting and a table must be free. The Host acts before the Waiter, so the Waiter can take the order of a customer the Host has just seated.
+
+## Happy Hour
+
+Happy Hour can be started once per game, at the start of a turn before any staff member acts. It lasts that turn and the next. The start of each turn shows whether it is available, active (with the turns left) or ended. While it is active:
+
+- orders taken get 20% off;
+- every customer still waiting for a table or for food (WAITING, SEATED or ORDERED) recovers 15 satisfaction at the start of each active turn, up to 100.
+
+Orders taken before Happy Hour keep their price, and customers who have already left are not affected.
+
+## Prices
+
+An order's price is locked when the Waiter takes it, and the Cashier later charges exactly that price. The UI shows it, for example `Customer 4 ordered Pasta (order 4, $14.40).`
+
+1. Start from the dish's price. A combo costs 90% of its two items, rounded to the nearest cent.
+2. Apply the customer's own discount (VIP: 10% off).
+3. If Happy Hour is active, take 20% off that, rounded to the nearest cent.
+
+For example, a VIP's Burger during Happy Hour costs $15.00 → $13.50 → $10.80. In this game the VIP orders Burger and Pasta: $29.70 → $26.73, or $21.38 during Happy Hour.
 
 ## Stages
 
@@ -73,7 +98,37 @@ Unchanged: `Restaurant`, `Table`, `Order`, `MenuItem`, the staff classes and the
 
 ### Stage 2 → Stage 3
 
-_To be added: new files; existing files changed or deleted, with reasons; compare link._
+Compare: [stage-2...stage-3](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-2...stage-3)
+
+New files:
+
+- `Dish.java`: interface with `getName()`, `getPriceCents()` and `getPrepUnits()`. An order must be able to hold either a single menu item or a combo. `MenuItem` is an enum and cannot extend a class, so an interface is the way for both to share one type.
+- `ComboMeal.java`: a `Dish` made of two existing `MenuItem`s. Its prep units are the sum of both; its price is 90% of their total, rounded to the nearest cent.
+- `HappyHour.java`: the once-per-game policy: whether it can start, the turns left, the 20% discount and the 15 recovery.
+- `Host.java`: a `Staff` subclass with `seatCustomer()`, so it gets the one-action-per-turn rule from `Staff`.
+- `docs/test-runs/stage3-victory.txt` and `stage3-defeat.txt`: Stage 3 test runs.
+
+Changed files:
+
+- `MenuItem.java`: `implements Dish`. Its existing methods already match the interface, so nothing else changes.
+- `Order.java`: the item is a `Dish` instead of a `MenuItem` (field, constructor and `getItem()`), so an order can hold a combo. `Order` and the UI only call `getName()` and `getPrepUnits()` on the item, so the Chef and the UI handle a combo with no type checks.
+- `Customer.java`: `chooseItem()` returns a `Dish` and applies the combo rule (see Food choice). Adds `recoverSatisfaction()` and `MAX_SATISFACTION` for Happy Hour; recovery uses the same status check as `loseSatisfaction()`, so only customers still waiting for a table or food recover.
+- `CriticCustomer.java`: `chooseItem()` returns `Dish` to match `Customer`. The Critic still always orders Pasta.
+- `Restaurant.java`: creates and owns the Host (`host`, `getHost()`), like the other staff.
+- `GameController.java`:
+  - owns a `HappyHour`. `activateHappyHour()` starts it (once, and only before any staff member acts), `startTurn()` gives the recovery while it is active and `endTurn()` counts it down.
+  - `hostSeatCustomer()` runs the Host's action, and `startTurn()` resets the Host with the other staff.
+  - `takeOrder()` locks the price with `lockPrice()`: the customer's own discount first, then Happy Hour.
+  - `customersInRestaurant()` is the list `endTurn()` already built, moved into a method so `recoverWaitingCustomers()` can use it too.
+- `Cashier.java`: charges `order.getPriceCents()` instead of calling `calculateBill()`. Discounts are now applied once, when the order is taken; calling `calculateBill()` again would give the VIP 10% off twice.
+- `ConsoleUI.java`: Happy Hour and Host prompts at the start of each turn, a Happy Hour status line, the Host's tasks in the task list, and the locked price when an order is taken.
+- `Waiter.java`: three error messages now end with a full stop, to match the Host's. No change in behaviour.
+- `docs/uml/class-diagram.drawio` and `.png`: adds `Dish`, `ComboMeal`, `HappyHour` and `Host`, and the changes above.
+- `docs/test-notes.md`: adds the Stage 3 runs. The Stage 1 and Stage 2 runs are now replayed at their tags.
+
+No files were deleted.
+
+Unchanged: `Staff`, `Chef`, `Table`, `VIPCustomer`, `RegularCustomer`, `ActionResult`, `CustomerStatus` and `OrderStatus`. The Host reuses `Staff`'s one-action-per-turn rule, and `VIPCustomer.calculateBill()` is still the VIP discount, now applied when the order is taken instead of at payment. Each turn now starts with the optional Happy Hour and the Host; the Waiter, Chef and end-of-turn steps are as before.
 
 ## Video timestamps
 
