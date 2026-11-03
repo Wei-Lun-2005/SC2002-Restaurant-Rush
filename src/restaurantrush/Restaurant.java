@@ -20,6 +20,7 @@ public class Restaurant {
     private Waiter waiter;
     private Chef chef;
     private Cashier cashier;
+    private Host host;
     private int revenueCents;
     private int paidCount;
     private int satisfactionSum;
@@ -36,6 +37,7 @@ public class Restaurant {
         waiter = new Waiter();
         chef = new Chef();
         cashier = new Cashier();
+        host = new Host();
         revenueCents = 0;
         paidCount = 0;
         satisfactionSum = 0;
@@ -149,6 +151,10 @@ public class Restaurant {
 
     public Cashier getCashier() {
         return cashier;
+    }
+
+    public Host getHost() {
+        return host;
     }
 
     public int getPaidCount() {
