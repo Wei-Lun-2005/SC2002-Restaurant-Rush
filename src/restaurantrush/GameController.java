@@ -74,7 +74,7 @@ public class GameController {
         }
 
         // The customer picks the dish. Each customer orders once, so the order shares their id.
-        MenuItem item = customer.chooseItem();
+        Dish item = customer.chooseItem();
         Order order = new Order(customer.getId(), customer, item, item.getPriceCents());
 
         ActionResult result = restaurant.getWaiter().takeOrder(customer, order);

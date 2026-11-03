@@ -27,12 +27,18 @@ Six customers arrive on turns 1, 4, 7, 10, 13 and 16 and are numbered 1 to 6 in 
 
 ### Food choice
 
-Customers choose their own dish; the manager never chooses it. The rule is fixed so every run can be reproduced: Regular and VIP customer *n* orders menu item (*n* − 1) mod 3. The Critic always orders Pasta, the most expensive dish but also the slowest (2 Chef turns), so a Critic who already loses 12 per turn has to be seated and cooked for early.
+Customers choose their own dish; the manager never chooses it. The rule is fixed so every run can be reproduced:
+
+- Customer *n*'s usual item is menu item (*n* − 1) mod 3: Salad, Burger, Pasta, Salad, Burger, Pasta.
+- Odd-numbered customers (1, 3, 5) order their usual item on its own.
+- Even-numbered customers (2, 4, 6) order a combo of their usual item and the next item on the menu. A combo takes the prep units of both items and costs 90% of their combined price, rounded to the nearest cent.
+- The Critic overrides this and always orders Pasta, the most expensive dish but also the slowest (2 Chef turns), so a Critic who already loses 12 per turn has to be seated and cooked for early.
 
 | Customer | 1 | 2 | 3 | 4 | 5 | 6 |
 |----------|---|---|---|---|---|---|
 | Type | Regular | VIP | Regular | Critic | Regular | Regular |
-| Orders | Salad | Burger | Pasta | Pasta | Burger | Pasta |
+| Orders | Salad | Burger + Pasta combo | Pasta | Pasta | Burger | Pasta + Salad combo |
+| Price | $9.00 | $29.70, VIP pays $26.73 | $18.00 | $18.00 | $15.00 | $24.30 |
 
 ## Stages
 
