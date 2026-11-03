@@ -8,13 +8,13 @@ public class Waiter extends Staff {
             return ActionResult.fail("Waiter has already acted.");
         }
         if(c == null){
-            return ActionResult.fail("Customer does not exist");
+            return ActionResult.fail("Customer does not exist.");
         }
         if(c.getStatus() != CustomerStatus.WAITING){
             return ActionResult.fail("This is not a waiting customer.");
         }
         if(t == null || !t.isFree()){
-            return ActionResult.fail("Table is not free");
+            return ActionResult.fail("Table is not free.");
         }
 
         t.seat(c);
@@ -28,13 +28,13 @@ public class Waiter extends Staff {
             return ActionResult.fail("Waiter has already acted.");
         }
         if(c == null){
-            return ActionResult.fail("Customer does not exist");
+            return ActionResult.fail("Customer does not exist.");
         }
         if(c.getStatus() != CustomerStatus.SEATED){
             return ActionResult.fail("This is not a seated customer.");
         }
         if(o == null){
-            return ActionResult.fail("Order is invalid");
+            return ActionResult.fail("Order is invalid.");
         }
         if(o.getCustomer() != c){
             return ActionResult.fail("Order does not belong to this customer.");
@@ -50,7 +50,7 @@ public class Waiter extends Staff {
             return ActionResult.fail("Waiter has already acted.");
         }
         if(o == null){
-            return ActionResult.fail("Order is invalid");
+            return ActionResult.fail("Order is invalid.");
         }
         if(o.getStatus() != OrderStatus.READY){
             return ActionResult.fail("Order is not ready.");
