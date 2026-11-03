@@ -27,6 +27,8 @@ public class ConsoleUI {
         while (controller.isGameOver() == false){
             controller.startTurn();
             displayTurnStart();
+            promptHappyHour();
+            promptHost();
             promptWaiter();
             promptChef();
             controller.endTurn();
@@ -37,6 +39,16 @@ public class ConsoleUI {
 
     private void displayTurnStart() {
         System.out.println("Turn " + controller.getCurrentTurn() + ":");
+
+        HappyHour hh = controller.getHappyHour();
+        if (hh.isActive()) {
+            System.out.println("Happy Hour: ACTIVE (" + hh.getTurnsLeft() + " turn(s) left, 20% off new orders)");
+        } else if (hh.canActivate()) {
+            System.out.println("Happy Hour: available (lasts 2 turns, once per game)");
+        } else {
+            System.out.println("Happy Hour: ended");
+        }
+
         Restaurant restaurant = controller.getRestaurant();
         
         List<Customer> queue = restaurant.getWaitingQueue();
@@ -95,12 +107,58 @@ public class ConsoleUI {
             }
         }
 
+        List<String> hostTasks = new ArrayList<>();
+        if (restaurant.findFreeTable() != null) {
+            for (Customer c : queue) {
+                hostTasks.add("seat customer " + c.getId());
+            }
+        }
+
         System.out.println("Staff tasks available:");
+        System.out.println("Host: " + (hostTasks.isEmpty() ? "nothing to do" : String.join(", ", hostTasks)));
         System.out.println("Waiter: " + (waiterTasks.isEmpty() ? "nothing to do" : String.join(", ", waiterTasks)));
         System.out.println("Chef: " + (chefTasks.isEmpty() ? "nothing to do" : String.join(", ", chefTasks)));
 
         System.out.println();
 
+    }
+
+    private void promptHappyHour() {
+        if (!controller.getHappyHour().canActivate()) return;
+        
+        while (true) {
+            System.out.print("Activate Happy Hour now? (y/n): ");
+            String in = scanner.nextLine().trim().toLowerCase();
+            if (in.equals("n")) return;
+            if (in.equals("y")) {
+                ActionResult r = controller.activateHappyHour();
+                System.out.println(r.getMessage());
+                return;
+            }
+            System.out.println("Please enter y or n.");  
+        }    
+    }
+
+    private void promptHost() {
+        Restaurant r = controller.getRestaurant();
+        if (!r.getHost().canAct() || r.getWaitingQueue().isEmpty()
+            || r.findFreeTable() == null) return;
+
+        System.out.println("Host: choose a waiting customer to seat (0 to skip)");
+        for (Customer c : r.getWaitingQueue()) {
+            System.out.println("  " + c.getId() + " - " + c.getTypeName() + " (satisfaction " + c.getSatisfaction() + ")");
+        }
+        while (true) {
+            System.out.print("Customer id: ");
+            String in = scanner.nextLine().trim();
+            int id;
+            try { id = Integer.parseInt(in); }
+            catch (NumberFormatException e) { System.out.println("Enter a number."); continue; }
+            if (id == 0) return;
+            ActionResult res = controller.hostSeatCustomer(id);
+            System.out.println(res.getMessage());
+            if (res.isSuccess()) return;
+        }    
     }
 
     private void promptWaiter() {
