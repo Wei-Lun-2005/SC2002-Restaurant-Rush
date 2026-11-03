@@ -19,18 +19,28 @@ public class GameController {
 
     private int currentTurn;
     private final Restaurant restaurant;
+    private final HappyHour happyHour;
 
     public GameController() {
         this.currentTurn = 0;
         this.restaurant = new Restaurant();
+        this.happyHour = new HappyHour();
     }
 
-    /** Step 1: moves to the next turn, resets staff and adds any scheduled arrival. */
+    /**
+     * Step 1: moves to the next turn, resets staff, gives the Happy Hour
+     * recovery while it is active and adds any scheduled arrival.
+     */
     public void startTurn() {
         currentTurn++;
         restaurant.getWaiter().resetForTurn();
         restaurant.getChef().resetForTurn();
         restaurant.getCashier().resetForTurn();
+        restaurant.getHost().resetForTurn();
+
+        if (happyHour.isActive()) {
+            recoverWaitingCustomers();
+        }
 
         for (int arrivalTurn : ARRIVAL_TURNS) {
             if (arrivalTurn == currentTurn) {
@@ -45,6 +55,40 @@ public class GameController {
 
     public Restaurant getRestaurant() {
         return restaurant;
+    }
+
+    public HappyHour getHappyHour() {
+        return happyHour;
+    }
+
+    /**
+     * Starts Happy Hour for this turn and the next. Allowed once per game,
+     * and only at the start of a turn, before any staff member has acted.
+     */
+    public ActionResult activateHappyHour() {
+        if (!happyHour.canActivate()) {
+            return ActionResult.fail("Happy Hour has already been used.");
+        }
+        if (!restaurant.getHost().canAct() || !restaurant.getWaiter().canAct()
+                || !restaurant.getChef().canAct()) {
+            return ActionResult.fail("Happy Hour can only start at the beginning of a turn.");
+        }
+        happyHour.activate();
+        // startTurn() has already run, so this turn's recovery is given here.
+        recoverWaitingCustomers();
+        return ActionResult.ok();
+    }
+
+    /** The Host seats at most one waiting customer per turn, in addition to the Waiter. */
+    public ActionResult hostSeatCustomer(int customerId) {
+        Customer customer = restaurant.findCustomer(customerId);
+        Table table = restaurant.findFreeTable();
+
+        ActionResult result = restaurant.getHost().seatCustomer(customer, table);
+        if (result.isSuccess()) {
+            restaurant.removeFromQueue(customer);
+        }
+        return result;
     }
 
     // Waiter actions must fail once the Chef has acted this turn,
@@ -75,7 +119,7 @@ public class GameController {
 
         // The customer picks the dish. Each customer orders once, so the order shares their id.
         Dish item = customer.chooseItem();
-        Order order = new Order(customer.getId(), customer, item, item.getPriceCents());
+        Order order = new Order(customer.getId(), customer, item, lockPrice(customer, item));
 
         ActionResult result = restaurant.getWaiter().takeOrder(customer, order);
         if (result.isSuccess()) {
@@ -102,15 +146,13 @@ public class GameController {
         return restaurant.getChef().prepareOrder(order);
     }
 
-    /** Steps 4 and 5: eating, payment, satisfaction loss and departures. */
+    /**
+     * Steps 4 and 5: eating, payment, satisfaction loss and departures.
+     * Then one turn of Happy Hour is used up.
+     */
     public void endTurn() {
         // Copy everyone in the restaurant first, because departures change the queue and tables.
-        List<Customer> customers = new ArrayList<>(restaurant.getWaitingQueue());
-        for (Table table : restaurant.getTables()) {
-            if (!table.isFree()) {
-                customers.add(table.getCustomer());
-            }
-        }
+        List<Customer> customers = customersInRestaurant();
 
         // Step 4: a customer served on an earlier turn finishes eating,
         // then the Cashier takes at most one payment.
@@ -133,6 +175,8 @@ public class GameController {
                 restaurant.recordDeparture(customer);
             }
         }
+
+        happyHour.countDown();
     }
 
     public boolean isGameOver() {
@@ -162,5 +206,32 @@ public class GameController {
             return new CriticCustomer(customerId);
         }
         return new RegularCustomer(customerId);
+    }
+
+    /**
+     * The price is fixed when the order is taken: the customer's own discount
+     * first (VIP 10% off), then Happy Hour's 20% off if it is active.
+     */
+    private int lockPrice(Customer customer, Dish item) {
+        int price = customer.calculateBill(item.getPriceCents());
+        return happyHour.applyDiscount(price);
+    }
+
+    /** Happy Hour recovery for everyone still waiting for a table or food. */
+    private void recoverWaitingCustomers() {
+        for (Customer customer : customersInRestaurant()) {
+            customer.recoverSatisfaction(happyHour.getRecovery());
+        }
+    }
+
+    /** A new list of everyone in the queue or at a table. */
+    private List<Customer> customersInRestaurant() {
+        List<Customer> customers = new ArrayList<>(restaurant.getWaitingQueue());
+        for (Table table : restaurant.getTables()) {
+            if (!table.isFree()) {
+                customers.add(table.getCustomer());
+            }
+        }
+        return customers;
     }
 }
