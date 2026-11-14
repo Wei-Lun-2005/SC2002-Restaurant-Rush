@@ -69,9 +69,9 @@ For example, a VIP's Burger during Happy Hour costs $15.00 → $13.50 → $10.80
 
 | Stage | Tag | Adds |
 |-------|-----|------|
-| 1 Basic operation | `stage-1` | Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, both endings |
-| 2 Customer behaviour | `stage-2` | VIP and Critic customers |
-| 3 New role and menu policy | `stage-3` | Host, ComboMeal, Happy Hour |
+| 1 Basic operation | [`stage-1`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/tree/stage-1) | Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, both endings |
+| 2 Customer behaviour | [`stage-2`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/tree/stage-2) | VIP and Critic customers |
+| 3 New role and menu policy | [`stage-3`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/tree/stage-3) | Host, ComboMeal, Happy Hour |
 
 ### Stage 1 → Stage 2
 
