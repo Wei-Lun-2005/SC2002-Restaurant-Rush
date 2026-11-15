@@ -15,10 +15,10 @@ Lab group TAIS2, group 5.
 
 | Name | Matriculation number |
 |------|----------------------|
-| Ho Wei Lun | U2521103L |
-| Ng Yin Xuan Sarah | U2520489F |
-| Ang Ping Chien Jarrel | U2522720H |
-| Phang Chun Ean | U2521874L |
+| Ho Wei Lun | [matric number removed] |
+| Ng Yin Xuan Sarah | [matric number removed] |
+| Ang Ping Chien Jarrel | [matric number removed] |
+| Phang Chun Ean | [matric number removed] |
 … +51 lines
 
 I've reformatted the repo README and written a new one for the root of the zip. Nothing is committed or pushed. The repo README change is uncommitted, on a working branch called docs/readme-format, so main and GitHub are unchanged until you approve it.
