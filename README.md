@@ -1,8 +1,24 @@
 # Restaurant Rush
 
-SC2002 group assignment: a turn-based restaurant management game with a command-line interface, written in Java.
+A turn-based restaurant management game with a command-line interface, written in Java. SC2002/SC2302 group project by lab group TAIS2, group 5.
 
-Repository: https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush
+- **Repository:** https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush
+- **Stage tags:** [`stage-1`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/tree/stage-1), [`stage-2`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/tree/stage-2), [`stage-3`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/tree/stage-3)
+- **Stage comparisons:** [stage-1...stage-2](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-1...stage-2), [stage-2...stage-3](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-2...stage-3)
+- **Diagrams:** [class diagram](docs/uml/class-diagram.png), [sequence diagram](docs/uml/sequence-diagram.png)
+- **Test runs:** [docs/test-notes.md](docs/test-notes.md)
+- **Video timestamps:** [see below](#video-timestamps)
+
+## Contents
+
+1. [Build and run](#build-and-run)
+2. [How to play](#how-to-play)
+3. [Game rules](#game-rules)
+4. [Project structure](#project-structure)
+5. [Diagrams](#diagrams)
+6. [Test runs](#test-runs)
+7. [Stages](#stages)
+8. [Video timestamps](#video-timestamps)
 
 ## Build and run
 
@@ -13,11 +29,24 @@ javac --release 17 -d out src/restaurantrush/*.java
 java -cp out restaurantrush.ConsoleUI
 ```
 
-Each turn, choose whether to start Happy Hour (`y` or `n`, until it has been used), then which waiting customer the Host seats, then the Waiter's task and the id it applies to, then the order id for the Chef. Enter `0` to let the Host, Waiter or Chef skip. A prompt only appears when it applies.
+To run an earlier stage, check out its tag and build again, for example `git checkout stage-1`. Use `git checkout main` to return to the latest version.
 
-Reproducible victory and defeat runs are in [docs/test-notes.md](docs/test-notes.md).
+## How to play
 
-## Customers
+You are the manager of a restaurant with 2 tables, a Host, a Waiter, a Chef and a Cashier. Each staff member can act at most once per turn, so every turn you decide who is seated, served and cooked for first.
+
+Each turn the prompts come in this order, and a prompt only appears when it applies:
+
+1. **Happy Hour:** `y` or `n`, until it has been used.
+2. **Host:** the id of a waiting customer to seat, or `0` to skip.
+3. **Waiter:** a task and the id it applies to, or `0` to wait.
+4. **Chef:** the id of the order to work on, or `0` to wait.
+
+The Cashier acts on its own. The game ends after turn 18. You win if at least 4 customers have paid, the revenue is at least $45.00 and the average satisfaction of the paying customers is at least 60.
+
+## Game rules
+
+### Customers
 
 Six customers arrive on turns 1, 4, 7, 10, 13 and 16 and are numbered 1 to 6 in arrival order. Customer 2 is a VIP and customer 4 is a Critic; the rest are Regular. The UI shows each customer's type next to its number.
 
@@ -42,11 +71,11 @@ Customers choose their own dish; the manager never chooses it. The rule is fixed
 | Orders | Salad | Burger and Pasta (combo) | Pasta | Pasta | Burger | Pasta and Salad (combo) |
 | Price | $9.00 | $29.70, VIP pays $26.73 | $18.00 | $18.00 | $15.00 | $24.30 |
 
-## Host
+### Host
 
 The Host is a fourth staff member. Each turn the Host can seat at most one waiting customer, in addition to the Waiter, with the same checks: the customer must be waiting and a table must be free. The Host acts before the Waiter, so the Waiter can take the order of a customer the Host has just seated.
 
-## Happy Hour
+### Happy Hour
 
 Happy Hour can be started once per game, at the start of a turn before any staff member acts. It lasts that turn and the next. The start of each turn shows whether it is available, active (with the turns left) or ended. While it is active:
 
@@ -55,7 +84,7 @@ Happy Hour can be started once per game, at the start of a turn before any staff
 
 Orders taken before Happy Hour keep their price, and customers who have already left are not affected.
 
-## Prices
+### Prices
 
 An order's price is locked when the Waiter takes it, and the Cashier later charges exactly that price. The UI shows it, for example `Customer 4 ordered Pasta (order 4, $14.40).`
 
@@ -64,6 +93,48 @@ An order's price is locked when the Waiter takes it, and the Cashier later charg
 3. If Happy Hour is active, take 20% off that, rounded to the nearest cent.
 
 For example, a VIP's Burger during Happy Hour costs $15.00 → $13.50 → $10.80. In this game the VIP orders Burger and Pasta: $29.70 → $26.73, or $21.38 during Happy Hour.
+
+## Project structure
+
+```
+src/restaurantrush/    Java source (21 classes in Stage 3)
+docs/uml/              class diagram and sequence diagram (.drawio source and .png)
+docs/test-runs/        input files for the victory and defeat runs of each stage
+docs/test-notes.md     expected result of every run, turn by turn
+CONTRIBUTING.md        team workflow: branches, pull requests and coding rules
+```
+
+## Diagrams
+
+Each diagram has its `.drawio` source next to the `.png`.
+
+| Diagram | Describes | Link |
+|---------|-----------|------|
+| Class diagram | Stage 3 (final design) | [docs/uml/class-diagram.png](docs/uml/class-diagram.png) |
+| Class diagram | Stage 2 | [class-diagram.png at `stage-2`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/blob/stage-2/docs/uml/class-diagram.png) |
+| Class diagram | Stage 1 | [class-diagram.png at `stage-1`](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/blob/stage-1/docs/uml/class-diagram.png) |
+| Sequence diagram | Stage 3: the Critic's visit with Happy Hour | [docs/uml/sequence-diagram.png](docs/uml/sequence-diagram.png) |
+
+## Test runs
+
+The game has no randomness, so the same input always gives the same result. Replay a run from the repository root after building:
+
+```
+java -cp out restaurantrush.ConsoleUI < docs/test-runs/stage3-victory.txt
+```
+
+In Windows PowerShell, use `cmd /c "java -cp out restaurantrush.ConsoleUI < docs\test-runs\stage3-victory.txt"`. The Stage 1 and Stage 2 runs were recorded at their tags, so check out the tag first.
+
+| Stage | Run | Input file | Result |
+|-------|-----|------------|--------|
+| 3 | Victory | `docs/test-runs/stage3-victory.txt` | 5 paid, $83.13 revenue, average satisfaction 85.6 |
+| 3 | Defeat | `docs/test-runs/stage3-defeat.txt` | 0 paid, $0.00 revenue, 2 unhappy departures |
+| 2 | Victory | `docs/test-runs/stage2-victory.txt` | 5 paid, $73.50 revenue, average satisfaction 75.6 |
+| 2 | Defeat | `docs/test-runs/stage2-defeat.txt` | 0 paid, $0.00 revenue, 2 unhappy departures |
+| 1 | Victory | `docs/test-runs/victory.txt` | 5 paid, $66.00 revenue, average satisfaction 79.2 |
+| 1 | Defeat | `docs/test-runs/defeat.txt` | 0 paid, $0.00 revenue, 2 unhappy departures |
+
+[docs/test-notes.md](docs/test-notes.md) lists the inputs and the expected state after every turn.
 
 ## Stages
 
@@ -75,15 +146,15 @@ For example, a VIP's Burger during Happy Hour costs $15.00 → $13.50 → $10.80
 
 ### Stage 1 → Stage 2
 
-Compare: [stage-1...stage-2](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-1...stage-2)
+**Compare:** [stage-1...stage-2](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-1...stage-2)
 
-New files:
+**New files**
 
 - `VIPCustomer.java`: overrides `getWaitPenalty()` (5) and `calculateBill()` (10% off).
 - `CriticCustomer.java`: overrides `getWaitPenalty()` (12) and `chooseItem()` (always Pasta).
 - `docs/test-runs/stage2-victory.txt` and `stage2-defeat.txt`: Stage 2 test runs with a VIP and a Critic.
 
-Changed files:
+**Changed files**
 
 - `GameController.java`: `createArrival()` creates a VIP on turn 4 and a Critic on turn 10 (new constants `VIP_ARRIVAL_TURN` and `CRITIC_ARRIVAL_TURN`). This is the only place that names the concrete customer classes, so something here has to change to create the new types. The turn sequence itself is unchanged.
 - `Customer.java`: adds abstract `getTypeName()`, so the UI can label each customer without checking its type.
@@ -92,15 +163,15 @@ Changed files:
 - `docs/uml/class-diagram.drawio` and `.png`: adds the two new classes and `getTypeName()`.
 - `docs/test-notes.md`: adds the Stage 2 runs.
 
-No files were deleted.
+**Deleted files:** none.
 
-Unchanged: `Restaurant`, `Table`, `Order`, `MenuItem`, the staff classes and the turn sequence. `GameController.endTurn()` already calls `loseSatisfaction()`, which uses `getWaitPenalty()`; `takeOrder()` already calls `chooseItem()`; and `Cashier` already calls `calculateBill()`. The new behaviour comes from the subclasses overriding these methods, with no type checks anywhere.
+**Unchanged:** `Restaurant`, `Table`, `Order`, `MenuItem`, the staff classes and the turn sequence. `GameController.endTurn()` already calls `loseSatisfaction()`, which uses `getWaitPenalty()`; `takeOrder()` already calls `chooseItem()`; and `Cashier` already calls `calculateBill()`. The new behaviour comes from the subclasses overriding these methods, with no type checks anywhere.
 
 ### Stage 2 → Stage 3
 
-Compare: [stage-2...stage-3](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-2...stage-3)
+**Compare:** [stage-2...stage-3](https://github.com/Wei-Lun-2005/SC2002-Restaurant-Rush/compare/stage-2...stage-3)
 
-New files:
+**New files**
 
 - `Dish.java`: interface with `getName()`, `getPriceCents()` and `getPrepUnits()`. An order must be able to hold either a single menu item or a combo. `MenuItem` is an enum and cannot extend a class, so an interface is the way for both to share one type.
 - `ComboMeal.java`: a `Dish` made of two existing `MenuItem`s. Its prep units are the sum of both; its price is 90% of their total, rounded to the nearest cent.
@@ -108,11 +179,11 @@ New files:
 - `Host.java`: a `Staff` subclass with `seatCustomer()`, so it gets the one-action-per-turn rule from `Staff`.
 - `docs/test-runs/stage3-victory.txt` and `stage3-defeat.txt`: Stage 3 test runs.
 
-Changed files:
+**Changed files**
 
 - `MenuItem.java`: `implements Dish`. Its existing methods already match the interface, so nothing else changes.
 - `Order.java`: the item is a `Dish` instead of a `MenuItem` (field, constructor and `getItem()`), so an order can hold a combo. `Order` and the UI only call `getName()` and `getPrepUnits()` on the item, so the Chef and the UI handle a combo with no type checks.
-- `Customer.java`: `chooseItem()` returns a `Dish` and applies the combo rule (see Food choice). Adds `recoverSatisfaction()` and `MAX_SATISFACTION` for Happy Hour; recovery uses the same status check as `loseSatisfaction()`, so only customers still waiting for a table or food recover.
+- `Customer.java`: `chooseItem()` returns a `Dish` and applies the combo rule (see [Food choice](#food-choice)). Adds `recoverSatisfaction()` and `MAX_SATISFACTION` for Happy Hour; recovery uses the same status check as `loseSatisfaction()`, so only customers still waiting for a table or food recover.
 - `CriticCustomer.java`: `chooseItem()` returns `Dish` to match `Customer`. The Critic still always orders Pasta.
 - `Restaurant.java`: creates and owns the Host (`host`, `getHost()`), like the other staff.
 - `GameController.java`:
@@ -126,9 +197,9 @@ Changed files:
 - `docs/uml/class-diagram.drawio` and `.png`: adds `Dish`, `ComboMeal`, `HappyHour` and `Host`, and the changes above.
 - `docs/test-notes.md`: adds the Stage 3 runs. The Stage 1 and Stage 2 runs are now replayed at their tags.
 
-No files were deleted.
+**Deleted files:** none.
 
-Unchanged: `Staff`, `Chef`, `Table`, `VIPCustomer`, `RegularCustomer`, `ActionResult`, `CustomerStatus` and `OrderStatus`. The Host reuses `Staff`'s one-action-per-turn rule, and `VIPCustomer.calculateBill()` is still the VIP discount, now applied when the order is taken instead of at payment. Each turn now starts with the optional Happy Hour and the Host; the Waiter, Chef and end-of-turn steps are as before.
+**Unchanged:** `Staff`, `Chef`, `Table`, `VIPCustomer`, `RegularCustomer`, `ActionResult`, `CustomerStatus` and `OrderStatus`. The Host reuses `Staff`'s one-action-per-turn rule, and `VIPCustomer.calculateBill()` is still the VIP discount, now applied when the order is taken instead of at payment. Each turn now starts with the optional Happy Hour and the Host; the Waiter, Chef and end-of-turn steps are as before.
 
 ## Video timestamps
 
