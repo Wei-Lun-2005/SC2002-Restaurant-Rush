@@ -132,4 +132,24 @@ Unchanged: `Staff`, `Chef`, `Table`, `VIPCustomer`, `RegularCustomer`, `ActionRe
 
 ## Video timestamps
 
-_To be added._
+Times are in the group video, `SC2302_TAIS2_G5_Video.mp4` (16:02). The gameplay is the Stage 3 victory run, then the Stage 3 defeat run replayed from its input file.
+
+| # | Segment | Time |
+|---|---------|------|
+| 1 | The game launching from the submitted project | 1:56 |
+| 2 | Meaningful manager choices, including a decision where staff are constrained | 2:03 (the manager's choices each turn, from turn 1); 4:37 (turn 13: the Host seats customer 5 so that the Waiter can serve the Critic's Pasta) |
+| 3 | A dish going READY → SERVED → payment | 4:16 (turn 12: the Critic's Pasta is READY); 4:37 (turn 13: SERVED); 4:59 (turn 15: the Critic pays) |
+| 4 | A VIP or Critic behaviour | 2:44 (turn 4: the VIP orders a combo at 10% off); 3:39 (turn 10: the Critic arrives); 3:55 (turn 11: the Critic orders Pasta) |
+| 5 | A Stage 3 feature | 3:39 (turn 10: Happy Hour starts and the Host seats the Critic); 3:55 (turn 11: the price is locked at $14.40, 20% off); 6:06 (the same run with and without Happy Hour) |
+| 6 | One victory and one defeat | 5:26 (victory); 5:42 (defeat run, replayed from its input file); 5:51 (defeat result) |
+| 7 | The stage tag comparisons and the diagrams | 6:34 (final class diagram); 10:19 (class diagrams of all three stages); 10:46 (Stage 1 → Stage 2); 11:28 (Stage 2 → Stage 3); 13:04 (sequence diagram) |
+
+Parts of the video:
+
+| Time | Part |
+|------|------|
+| 0:00 | Game overview and the three stages |
+| 1:50 | Gameplay demonstration and key outcomes |
+| 6:34 | Class diagrams and evidence of stage changes |
+| 12:12 | Selected use case and sequence diagram |
+| 14:20 | Individual contributions and key learning |
